@@ -1,0 +1,29 @@
+#RhjHasan
+#Candle High Low
+input sym1 = "/NQ";
+input _m = AggregationPeriod.MIN;
+
+def sell = high(sym1, _m)[3] < high(sym1, _m)[2] && high(sym1, _m)[2] > high(sym1, _m)[1];
+def buy = low(sym1, _m)[3] > low(sym1, _m)[2] && low(sym1, _m)[2] < low(sym1, _m)[1];
+
+plot hoc = if buy[-2] then high(sym1, _m)[2] else Double.NaN;
+plot loc = if sell[-2] then low(sym1, _m)[2] else Double.NaN;
+
+hoc.SetPaintingStrategy(PaintingStrategy.HORIZONTAL);
+loc.SetPaintingStrategy(PaintingStrategy.HORIZONTAL);
+hoc.SetDefaultColor(GetColor(8));
+loc.SetDefaultColor(GetColor(8));
+
+plot Signal_Up = if buy[-2] then low else Double.NaN;
+Signal_Up.SetPaintingStrategy(PaintingStrategy.ARROW_UP);
+
+plot Signal_Dn = if sell[-2] then high else Double.NaN;
+Signal_Dn.SetPaintingStrategy(PaintingStrategy.ARROW_DOWN);
+
+def sell_h = high(sym1, _m)[2];
+
+def buy_l = low(sym1, _m)[2];
+
+# Alerts
+Alert(Signal_Up, buy_l, Alert.Bar, Sound.Chimes);
+Alert(Signal_Dn, sell_h, Alert.Bar, Sound.Bell);
