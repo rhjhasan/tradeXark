@@ -3,20 +3,21 @@
 
 input sym1 = "/NQ";
 
+input no_plots = 10;
+
 input _m = AggregationPeriod.MIN;
 
 def sell = high(sym1, _m)[3] < high(sym1, _m)[2] && high(sym1, _m)[2] > high(sym1, _m)[1];
 
 def buy = low(sym1, _m)[3] > low(sym1, _m)[2] && low(sym1, _m)[2] < low(sym1, _m)[1];
 
-plot Signal_Up = if buy[-2] then low else Double.NaN;
+plot Signal_Up = if (GetAggregationPeriod() == _m) and buy[-2] and close[-2] and isnan(close[-no_plots*5]) then low else Double.NaN;
 Signal_Up.SetPaintingStrategy(PaintingStrategy.ARROW_UP);
-plot Signal_Dn = if sell[-2] then high else Double.NaN;
+plot Signal_Dn = if (GetAggregationPeriod() == _m) and sell[-2] and close[-2] and isnan(close[-no_plots*5]) then high else Double.NaN;
 Signal_Dn.SetPaintingStrategy(PaintingStrategy.ARROW_DOWN);
 
-def sell_h = high(sym1, _m)[2];
+#def buy_l = if buy[-2] and close[-2] then low else Double.NaN;
+#def sell_h = if sell[-2] and close[-2] then high else Double.NaN;
 
-def buy_l = low(sym1, _m)[2];
-# Alerts
-Alert(Signal_Up, buy_l, Alert.Bar, Sound.Chimes);
-Alert(Signal_Dn, sell_h, Alert.Bar, Sound.Bell);
+AddChartBubble(signal_Dn and isnan(close[-no_plots]), high, "High of " + ": " + high, Color.red, yes);
+AddChartBubble(signal_Up  and isnan(close[-no_plots]), low, "Low of " + ": " + low, Color.green, no);
